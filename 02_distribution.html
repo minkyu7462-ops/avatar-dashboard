@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마영전 아바타 — 캐릭터당 보유량 분포</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f9fa;color:#1a1a1a;min-height:100vh}
+  .page{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+  .page-title{font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+  .page-sub{font-size:13px;color:#6b7280;margin-bottom:1.5rem}
+  .divider{border:none;border-top:1px solid #e5e7eb;margin:1.75rem 0}
+  .sec-lbl{font-size:11px;font-weight:600;color:#6b7280;letter-spacing:.07em;text-transform:uppercase;margin:1.5rem 0 .75rem}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1rem}
+  .kpi{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:1rem 1.25rem}
+  .kpi-lbl{font-size:11px;color:#6b7280;margin-bottom:6px}
+  .kpi-val{font-size:22px;font-weight:600;color:#111827}
+  .kpi-val.blue{color:#1d4ed8}
+  .kpi-sub{font-size:11px;color:#9ca3af;margin-top:3px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.1rem 1.25rem}
+  .card.full{grid-column:1/-1}
+  .ct{font-size:13px;font-weight:600;color:#111827;margin-bottom:3px}
+  .cs{font-size:11px;color:#6b7280;margin-bottom:.75rem}
+  .tab-row{display:flex;gap:6px;margin-bottom:.75rem}
+  .tab{font-size:11px;padding:4px 10px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;color:#6b7280;transition:all .15s}
+  .tab:hover{background:#f3f4f6}
+  .tab.on{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;font-weight:500}
+  .bi{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .bl{font-size:11px;color:#6b7280;width:150px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bl.s{width:60px}
+  .bt{flex:1;background:#f3f4f6;border-radius:4px;height:19px;position:relative;overflow:hidden}
+  .bbg{position:absolute;left:0;top:0;height:100%;border-radius:4px;opacity:.22}
+  .bv{position:relative;z-index:1;font-size:10px;font-weight:600;white-space:nowrap;padding:0 6px;line-height:19px;float:right}
+  .leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+  .li{display:flex;align-items:center;gap:5px;font-size:11px;color:#6b7280}
+  .ld{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+  .etc-item{background:#f9fafb;border-radius:8px;padding:.6rem .9rem;margin-bottom:6px;border:1px solid #f3f4f6}
+  .etc-row{display:flex;align-items:center;justify-content:space-between;font-size:12px}
+  .note-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:.75rem 1rem;font-size:12px;color:#92400e;margin-bottom:1rem;line-height:1.6}
+  @media(max-width:700px){
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .row2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-title">캐릭터당 아바타 파츠 보유량 분포</div>
+  <div class="page-sub">기준일: 2026-05-12 &nbsp;|&nbsp; 분석 캐릭터: 71,715명 &nbsp;|&nbsp; 전체 파츠 기준</div>
+
+  <div class="kpi-grid" style="margin-bottom:1.25rem">
+    <div class="kpi"><div class="kpi-lbl">분석 캐릭터</div><div class="kpi-val">71,715</div><div class="kpi-sub">명</div></div>
+    <div class="kpi"><div class="kpi-lbl">중앙값</div><div class="kpi-val">10</div><div class="kpi-sub">개</div></div>
+    <div class="kpi"><div class="kpi-lbl">평균</div><div class="kpi-val">24.8</div><div class="kpi-sub">개 (롱테일 영향)</div></div>
+    <div class="kpi"><div class="kpi-lbl">최대</div><div class="kpi-val">3,815</div><div class="kpi-sub">개</div></div>
+  </div>
+  <div class="row2">
+    <div class="card">
+      <div class="ct">구간별 캐릭터 수</div>
+      <div class="cs">보유량 구간별 캐릭터 분포 — 파란색 라이트 / 초록 코어 / 주황 헤비 / 빨강 슈퍼헤비</div>
+      <div style="position:relative;width:100%;height:340px">
+        <canvas id="dist-chart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">누적 분포</div>
+      <div class="cs">해당 구간까지 포함된 캐릭터 누적 비율 — 10개 이하가 전체의 50.5%</div>
+      <div style="position:relative;width:100%;height:340px">
+        <canvas id="cum-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+<script>
+const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+const distLabels=['1~5','6~10','11~20','21~30','31~50','51~75','76~100','101~150','151~200','201~300','301~500','501+'];
+const distCounts=[21194,14989,16559,6855,5352,2669,1181,1183,595,588,358,192];
+const total=distCounts.reduce((a,b)=>a+b,0);
+const pcts=distCounts.map(v=>Math.round(v/total*1000)/10);
+const cumPcts=[];let acc=0;
+pcts.forEach(p=>{acc=Math.round((acc+p)*10)/10;cumPcts.push(acc);});
+const barColors=distCounts.map((_,i)=>i<=1?'#2563eb':i<=3?'#059669':i<=5?'#d97706':'#dc2626');
+const gridC='rgba(0,0,0,0.06)',tickC='#9ca3af';
+new Chart(document.getElementById('dist-chart'),{type:'bar',
+  data:{labels:distLabels,datasets:[{label:'캐릭터 수',data:distCounts,
+    backgroundColor:barColors.map(c=>c+'33'),borderColor:barColors,borderWidth:1.5,borderRadius:3}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>[` ${fmt(ctx.raw)}명 (${pcts[ctx.dataIndex]}%)`]}}},
+    scales:{x:{grid:{display:false},ticks:{color:tickC,font:{size:10},autoSkip:false,maxRotation:0}},
+            y:{grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>fmt(v)}}}}});
+new Chart(document.getElementById('cum-chart'),{type:'line',
+  data:{labels:distLabels,datasets:[{label:'누적 비율',data:cumPcts,
+    borderColor:'#7c3aed',backgroundColor:'#7c3aed18',borderWidth:2,
+    pointRadius:4,pointBackgroundColor:'#7c3aed',fill:true,tension:0.3}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>[` 누적 ${ctx.raw}% — 이 구간까지 ${ctx.raw}%의 캐릭터 포함`]}}},
+    scales:{x:{grid:{display:false},ticks:{color:tickC,font:{size:10},autoSkip:false,maxRotation:0}},
+            y:{min:0,max:100,grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>v+'%'}}}}});
+</script>
+  <div style="font-size:11px;color:#9ca3af;text-align:center;padding-bottom:1rem;margin-top:1.75rem">
+    마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12
+  </div>
+</div>
+</body>
+</html>
