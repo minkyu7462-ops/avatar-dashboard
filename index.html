@@ -134,6 +134,31 @@
   </div>
 
   <hr class="divider">
+  <div class="sec-lbl">캐릭터당 아바타 파츠 보유량 분포</div>
+  <div class="kpi-grid" style="margin-bottom:1.25rem">
+    <div class="kpi"><div class="kpi-lbl">분석 캐릭터</div><div class="kpi-val">71,715</div><div class="kpi-sub">명</div></div>
+    <div class="kpi"><div class="kpi-lbl">중앙값</div><div class="kpi-val">10</div><div class="kpi-sub">개</div></div>
+    <div class="kpi"><div class="kpi-lbl">평균</div><div class="kpi-val">24.8</div><div class="kpi-sub">개 (롱테일 영향)</div></div>
+    <div class="kpi"><div class="kpi-lbl">최대</div><div class="kpi-val">3,815</div><div class="kpi-sub">개</div></div>
+  </div>
+  <div class="row2">
+    <div class="card">
+      <div class="ct">구간별 캐릭터 수</div>
+      <div class="cs">보유량 구간별 캐릭터 분포 — 파란색 라이트 / 초록 코어 / 주황 헤비 / 빨강 슈퍼헤비</div>
+      <div style="position:relative;width:100%;height:300px">
+        <canvas id="dist-chart" role="img" aria-label="캐릭터당 아바타 파츠 보유량 구간별 분포 막대 그래프"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">누적 분포</div>
+      <div class="cs">해당 구간까지 포함된 캐릭터 누적 비율 — 10개 이하가 전체의 50.5%</div>
+      <div style="position:relative;width:100%;height:300px">
+        <canvas id="cum-chart" role="img" aria-label="캐릭터당 보유량 누적 분포 선 그래프"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
   <div style="font-size:11px;color:#9ca3af;text-align:center;padding-bottom:1rem">
     마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12
   </div>
@@ -326,6 +351,71 @@ drawCat('d'); drawSlot('d'); buildHeatmap();
 buildChart('decomp-chart','decomp-leg',TOP20_DECOMP,'잠재분해','잠재분해량');
 buildChart('dup-chart','dup-leg',TOP20_DUP,'중복보유율','중복보유율(%)');
 buildEtc();
+
+(function(){
+  const distLabels=['1~5','6~10','11~20','21~30','31~50','51~75','76~100','101~150','151~200','201~300','301~500','501+'];
+  const distCounts=[21194,14989,16559,6855,5352,2669,1181,1183,595,588,358,192];
+  const total=distCounts.reduce((a,b)=>a+b,0);
+  const pcts=distCounts.map(v=>Math.round(v/total*1000)/10);
+  const cumPcts=[];let acc=0;
+  pcts.forEach(p=>{acc=Math.round((acc+p)*10)/10;cumPcts.push(acc);});
+  const barColors=distCounts.map((_,i)=>i<=1?'#2563eb':i<=3?'#059669':i<=5?'#d97706':'#dc2626');
+  const gridC='rgba(0,0,0,0.06)';
+  const tickC='#9ca3af';
+
+  new Chart(document.getElementById('dist-chart'),{
+    type:'bar',
+    data:{
+      labels:distLabels,
+      datasets:[{
+        label:'캐릭터 수',
+        data:distCounts,
+        backgroundColor:barColors.map(c=>c+'33'),
+        borderColor:barColors,
+        borderWidth:1.5,
+        borderRadius:3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:ctx=>[` ${fmt(ctx.raw)}명 (${pcts[ctx.dataIndex]}%)`]
+      }}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:tickC,font:{size:10},autoSkip:false,maxRotation:0}},
+        y:{grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>fmt(v)}}
+      }
+    }
+  });
+
+  new Chart(document.getElementById('cum-chart'),{
+    type:'line',
+    data:{
+      labels:distLabels,
+      datasets:[{
+        label:'누적 비율',
+        data:cumPcts,
+        borderColor:'#7c3aed',
+        backgroundColor:'#7c3aed18',
+        borderWidth:2,
+        pointRadius:4,
+        pointBackgroundColor:'#7c3aed',
+        fill:true,
+        tension:0.3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:ctx=>[` 누적 ${ctx.raw}% — 이 구간까지 ${ctx.raw}%의 캐릭터 포함`]
+      }}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:tickC,font:{size:10},autoSkip:false,maxRotation:0}},
+        y:{min:0,max:100,grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>v+'%'}}
+      }
+    }
+  });
+})();
 </script>
 </body>
 </html>
