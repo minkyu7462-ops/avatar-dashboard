@@ -369,13 +369,174 @@
     </table>
   </div>
 
+  <!-- UID 미착용 구간 분포 -->
+  <hr>
+  <div class="sec-lbl">UID별 분해 후보 파츠 구간 분포 — 2단계 보상 설계 기준</div>
+
+  <div style="background:#0a1628;border:1px solid #1e3a5f;border-radius:10px;padding:.9rem 1.2rem;margin-bottom:1rem;font-size:12px;color:#93c5fd;line-height:1.75">
+    📐 <strong style="color:#fff">산출 방법:</strong>
+    charid × itemid 레벨 정밀 매칭 결과를 UID 단위로 합산 (단일 미착용 + 중복 여분).
+    스냅샷 없는 캐릭터(4,910명, 미접속 추정)는 제외하고 산출했습니다.
+  </div>
+
+  <div class="kpi-grid" style="margin-bottom:12px">
+    <div class="kpi"><div class="kpi-lbl">총 분해 후보 파츠</div><div class="kpi-val w" style="font-size:18px">1,370,401</div><div class="kpi-sub">개 (단일 미착용 + 중복 여분 합산)</div></div>
+    <div class="kpi hero"><div class="kpi-lbl">분해 대상 UID</div><div class="kpi-val g">14,027</div><div class="kpi-sub">명 (83.8%) — UID당 평균 97.7개</div></div>
+    <div class="kpi red-k"><div class="kpi-lbl">UID당 중앙값</div><div class="kpi-val r">38개</div><div class="kpi-sub">(분해 대상자 기준) | 전체 중앙값 24개</div></div>
+    <div class="kpi blue-k"><div class="kpi-lbl">상위 5% 점유율</div><div class="kpi-val b">35.9%</div><div class="kpi-sub">836명이 491,531개 보유 — 수급 충격 핵심</div></div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card accent">
+      <div class="ct">구간별 UID 수 분포</div>
+      <div class="cs">분해 후보 파츠 수량 기준 — 2단계 타깃 구간 식별용</div>
+      <div id="segment-bars"></div>
+    </div>
+    <div class="card">
+      <div class="ct">구간별 파츠 총량 점유율</div>
+      <div class="cs">교환 상점 수급 계획 — 어느 구간이 물량을 주도하는가</div>
+      <canvas id="segment-pie" height="230"></canvas>
+    </div>
+  </div>
+
+  <!-- 구간 상세표 -->
+  <div class="card full" style="margin-bottom:12px">
+    <div class="ct">구간별 상세 수치 및 2단계 설계 시사점</div>
+    <div class="cs">단일 미착용 + 중복 여분 합산 기준 | 스냅샷 있는 캐릭터 보유 UID 기준</div>
+    <table class="tbl" id="segment-table">
+      <thead>
+        <tr>
+          <th>구간</th><th>UID 수</th><th>비율</th><th>누적</th>
+          <th>파츠 총량</th><th>UID당 평균</th><th>총량 점유율</th><th>설계 시사점</th>
+        </tr>
+      </thead>
+      <tbody id="seg-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- 3단계 전략별 물량 -->
+  <div class="sec-lbl">3단계 전략별 예상 분해 물량</div>
+  <div class="card full" style="margin-bottom:12px">
+    <div class="ct">단계별 참여 UID · 분해 물량 추정</div>
+    <div class="cs">1단계 대비 2단계의 물량 규모 차이가 핵심 설계 변수</div>
+    <table class="tbl">
+      <thead>
+        <tr><th>전략 단계</th><th>참여 예상 UID</th><th>예상 분해 물량</th><th>비고</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:#6ee7b7;font-weight:600">1단계 — 중복 보유 여분</td>
+          <td class="hi">4,238명</td>
+          <td class="hi">60,943개</td>
+          <td class="dim">정확값 · 즉각 분해 가능</td>
+        </tr>
+        <tr>
+          <td style="color:#93c5fd;font-weight:600">2단계 핵심 — 21개+ 미착용</td>
+          <td>8,734명</td>
+          <td>1,264,487개</td>
+          <td class="dim">분해 의향 강한 그룹 집계</td>
+        </tr>
+        <tr>
+          <td style="color:#cbd5e1;font-weight:600">2단계 전체 — 1개+ 미착용</td>
+          <td>14,027명</td>
+          <td>1,370,401개</td>
+          <td class="dim">최대 추정치</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="background:#1a2635;border-radius:8px;padding:.75rem 1rem;margin-top:.85rem;font-size:12px;color:#93c5fd;line-height:1.7">
+      ⚠ <strong style="color:#fff">1단계(61K개)와 2단계(최대 1.37M개)의 물량 격차: 22배.</strong><br>
+      교환 상점 재화 설계 시, 2단계 전환 후 물량 급증에 대한 수급 계획이 반드시 선행되어야 합니다.
+      상위 5%(836명)의 점유율이 35.9%이므로 이 그룹의 행동 패턴이 시장 전체를 결정합니다.
+    </div>
+  </div>
+
+  <!-- 집중도 -->
+  <div class="sec-lbl">파츠 물량 집중도 — 교환 상점 수급 충격 위험</div>
+  <div class="grid3">
+    <div class="kpi red-k" style="border-radius:10px;padding:1rem 1.1rem">
+      <div class="kpi-lbl">상위 5% (836명) 점유율</div>
+      <div class="kpi-val r">35.9%</div>
+      <div class="kpi-sub">491,531개 — 최대 위험 그룹</div>
+    </div>
+    <div class="kpi" style="border-radius:10px;padding:1rem 1.1rem">
+      <div class="kpi-lbl">상위 10% (1,673명) 점유율</div>
+      <div class="kpi-val w">53.2%</div>
+      <div class="kpi-sub">729,401개</div>
+    </div>
+    <div class="kpi" style="border-radius:10px;padding:1rem 1.1rem">
+      <div class="kpi-lbl">상위 20% (3,347명) 점유율</div>
+      <div class="kpi-val w">73.6%</div>
+      <div class="kpi-sub">1,008,738개</div>
+    </div>
+  </div>
+
   <div style="font-size:11px;color:#334155;text-align:center;padding-top:2rem">
     마비노기 영웅전 아바타 분해 시스템 기획 검토 · 내부 자료 · 기준일 2026-05-12 · 3차 최종 2026-05-15
   </div>
 </div>
 
 <script>
+// 구간 데이터
+const SEGMENTS = [
+  {label:'0개 (없음)',   uid:2710,  pct:16.2, cum:16.2,  items:0,       avg:0,    itemPct:0,   note:'시스템 비대상'},
+  {label:'1~5개',       uid:1976,  pct:11.8, cum:28.0,  items:6721,    avg:3.4,  itemPct:0.5, note:'낮은 분해 동기 — 고가치 보상 필요'},
+  {label:'6~10개',      uid:1375,  pct:8.2,  cum:36.2,  items:10950,   avg:8.0,  itemPct:0.8, note:'가벼운 경험으로 유인 가능'},
+  {label:'11~20개',     uid:1841,  pct:11.0, cum:47.2,  items:27611,   avg:15.0, itemPct:2.0, note:'정리 동기 충분, 중간 매력도 보상'},
+  {label:'21~50개',     uid:2688,  pct:16.1, cum:63.3,  items:90443,   avg:33.6, itemPct:6.6, note:'핵심 타깃 — 2단계 초기 주력'},
+  {label:'51~100개',    uid:2193,  pct:13.1, cum:76.4,  items:158898,  avg:72.5, itemPct:11.6,note:'높은 참여 기대, 반복 분해'},
+  {label:'101~200개',   uid:1978,  pct:11.8, cum:88.2,  items:281019,  avg:142.1,itemPct:20.5,note:'대량 분해 — 경제 충격 모니터링'},
+  {label:'201~500개',   uid:1554,  pct:9.3,  cum:97.5,  items:474444,  avg:305.3,itemPct:34.6,note:'교환 상점 수급에 큰 영향'},
+  {label:'501개+',      uid:422,   pct:2.5,  cum:100.0, items:320315,  avg:759.0,itemPct:23.4,note:'극단적 고보유 — 별도 관리'},
+];
+
+const COLORS = ['#334155','#93c5fd','#60a5fa','#3b82f6','#10b981','#f59e0b','#f97316','#ef4444','#dc2626'];
 const fmt = n => n.toLocaleString();
+
+// 구간 바
+const maxUid = Math.max(...SEGMENTS.map(d=>d.uid));
+document.getElementById('segment-bars').innerHTML = SEGMENTS.map((d,i)=>`
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+    <div style="font-size:10.5px;color:#64748b;width:80px;flex-shrink:0;text-align:right">${d.label}</div>
+    <div style="flex:1;background:#0f172a;border-radius:4px;height:22px;position:relative;overflow:hidden">
+      <div style="position:absolute;left:0;top:0;height:100%;width:${(d.uid/maxUid*100).toFixed(1)}%;background:${COLORS[i]};border-radius:4px"></div>
+      <span style="position:relative;z-index:1;font-size:10.5px;font-weight:700;color:${COLORS[i]};padding:0 7px;line-height:22px;float:right;white-space:nowrap">${fmt(d.uid)}명 (${d.pct}%)</span>
+    </div>
+  </div>`).join('');
+
+// 파이차트 — 파츠 총량 기준
+new Chart(document.getElementById('segment-pie'),{
+  type:'doughnut',
+  data:{
+    labels: SEGMENTS.filter(d=>d.items>0).map(d=>d.label),
+    datasets:[{
+      data: SEGMENTS.filter(d=>d.items>0).map(d=>d.items),
+      backgroundColor: COLORS.slice(1),
+      borderWidth:2, borderColor:'#0f172a'
+    }]
+  },
+  options:{responsive:true,plugins:{
+    legend:{position:'right',labels:{color:'#64748b',font:{size:10},boxWidth:10,padding:6}},
+    tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${fmt(ctx.raw)}개 (${ctx.dataset.data.reduce((a,b)=>a+b,0) > 0 ? (ctx.raw/ctx.dataset.data.reduce((a,b)=>a+b,0)*100).toFixed(1) : 0}%)`}}
+  },cutout:'45%'}
+});
+
+// 구간 테이블
+const totalItems = SEGMENTS.reduce((a,d)=>a+d.items,0);
+document.getElementById('seg-tbody').innerHTML = SEGMENTS.map((d,i)=>{
+  const isKey = d.label==='21~50개'||d.label==='51~100개';
+  const isHigh = d.label==='201~500개'||d.label==='501개+';
+  return `<tr style="${isKey?'background:#0a2118':isHigh?'background:#1a0a0a':''}">
+    <td style="font-weight:${isKey?700:400};color:${isKey?'#6ee7b7':isHigh?'#fca5a5':'#cbd5e1'}">${d.label}</td>
+    <td>${fmt(d.uid)}</td>
+    <td>${d.pct}%</td>
+    <td style="color:#475569">${d.cum}%</td>
+    <td>${d.items>0?fmt(d.items):'—'}</td>
+    <td>${d.avg>0?d.avg.toFixed(1)+'개':'—'}</td>
+    <td>${d.itemPct>0?d.itemPct+'%':'—'}</td>
+    <td style="font-size:11px;color:#64748b;text-align:left">${d.note}</td>
+  </tr>`;
+}).join('');
 
 // 분해 수요 세그먼트 바
 const DEMAND = [
