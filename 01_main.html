@@ -44,18 +44,43 @@
     .kpi-grid{grid-template-columns:repeat(2,1fr)}
     .row2{grid-template-columns:1fr}
   }
+  .nav-wrap{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+  .nav-btn{font-size:12px;padding:6px 14px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;text-decoration:none;transition:all .15s}
+  .nav-btn:hover{background:#f3f4f6}
+  .nav-btn.cur{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
 </style>
 </head>
 <body>
 <div class="page">
   <div class="page-title">마영전 아바타 파츠 보유현황 분석</div>
   <div class="page-sub">기준일: 2026-05-12 &nbsp;|&nbsp; 분석 캐릭터: 71,715명 &nbsp;|&nbsp; 스냅샷: 2026-02-11~05-10 (3개월) &nbsp;|&nbsp; 클론 아바타 제외</div>
+  <div class="nav-wrap">
+    <a class="nav-btn cur" href="01_main.html">① 기본 5파츠 분석</a>
+    <a class="nav-btn" href="02_distribution.html">② 보유량 분포</a>
+    <a class="nav-btn" href="03_unworn.html">③ 미착용 파츠</a>
+    <a class="nav-btn" href="04_uid_analysis.html">④ UID 분석</a>
+    <a class="nav-btn" href="05_decomp_demand.html">⑤ 분해 수요 최종</a>
+  </div>
+
+  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.7rem 1rem;font-size:12px;color:#166534;margin-bottom:.75rem;line-height:1.6">
+    ✅ <strong>2026-05-15 3차 정밀 분석 완료:</strong>
+    스냅샷 전수 수집(160개 구간)으로 charid × itemid 레벨 정밀 매칭이 완료됐습니다.
+    최종 분해 수요 확정 수치(83.8%)는 <a href="05_decomp_demand.html" style="color:#166534;font-weight:600">⑤ 분해 수요 최종</a>을 참고하세요.
+  </div>
+
   <div class="note-box">
     📌 <strong>잠재 분해량</strong> = 총 보유 수량 - 보유 캐릭 수 (캐릭당 최소 1개 착용 가정 후 잉여분) &nbsp;|&nbsp;
     <strong>중복 보유율</strong> = 동일 파츠를 2개 이상 보유한 캐릭 비율 &nbsp;|&nbsp;
     날개·꼬리·미니(정령)·오브젝트는 별도 정책 카테고리로 이 대시보드에서 제외
   </div>
 
+  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:.7rem 1rem;font-size:12px;color:#92400e;margin-bottom:1rem;line-height:1.6">
+    ⚠ <strong>1차 분석 표현 안내 — '잠재Pt':</strong>
+    이 페이지의 <strong>'잠재Pt'</strong>는 "분해 시 새로 획득하는 포인트"가 아닙니다.
+    드레스 포인트(pt)는 <strong>파츠 획득 시 이미 지급</strong>됩니다.
+    여기서 잠재Pt는 <strong>여분 파츠의 pt 등급 가치를 합산한 참고 지표</strong>입니다.
+    올바른 분해 수요 분석은 <a href="05_decomp_demand.html" style="color:#92400e;font-weight:600">⑤ 분해 수요 최종</a>을 참고하세요.
+  </div>
   <div class="sec-lbl">기본 5파츠 요약 — HELM · TUNIC · PANTS · GLOVES · BOOTS</div>
   <div class="kpi-grid">
     <div class="kpi"><div class="kpi-lbl">기본 5파츠 총 보유</div><div class="kpi-val">1,572,391</div><div class="kpi-sub">개</div></div>
@@ -71,7 +96,7 @@
       <div class="tab-row">
         <button class="tab on" onclick="sw('cat','d',this)">잠재분해량</button>
         <button class="tab" onclick="sw('cat','h',this)">총보유수량</button>
-        <button class="tab" onclick="sw('cat','p',this)">잠재Pt</button>
+        <button class="tab" onclick="sw('cat','p',this)">파츠 가치(pt 기준)</button>
       </div>
       <div id="cat-bars"></div>
     </div>
@@ -286,8 +311,21 @@ buildChart('decomp-chart','decomp-leg',TOP20_DECOMP,'잠재분해','잠재분해
 buildChart('dup-chart','dup-leg',TOP20_DUP,'중복보유율','중복보유율(%)');
 buildEtc();
 </script>
+
+  <hr class="divider">
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+    <div>
+      <div style="font-size:13px;font-weight:600;color:#1e40af;margin-bottom:4px">UID 단위 분석 · 3차 정밀 분해 수요 확인</div>
+      <div style="font-size:12px;color:#3b82f6">CID→UID 매핑 99.2% · 1,000pt+ 49명 전원 활성 · 최종 분해 수요 83.8% 확정</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="04_uid_analysis.html" style="display:inline-block;background:#1d4ed8;color:#fff;font-size:12px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none">④ UID 분석 →</a>
+      <a href="05_decomp_demand.html" style="display:inline-block;background:#059669;color:#fff;font-size:12px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none">⑤ 최종 수요 →</a>
+    </div>
+  </div>
+
   <div style="font-size:11px;color:#9ca3af;text-align:center;padding-bottom:1rem;margin-top:1.75rem">
-    마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12
+    마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12 기준 · 3차 업데이트 2026-05-15
   </div>
 </div>
 </body>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마영전 아바타 — ④ UID(유저) 단위 분석</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+  .shell{max-width:1140px;margin:0 auto;padding:2rem 1.5rem 4rem}
+  .top-bar{display:flex;align-items:center;gap:12px;margin-bottom:.4rem}
+  .srv-tag{font-size:10px;font-weight:700;letter-spacing:.1em;background:#1e3a5f;color:#93c5fd;padding:3px 9px;border-radius:4px;text-transform:uppercase}
+  .page-title{font-size:21px;font-weight:700;color:#0f172a;letter-spacing:-.02em;margin-bottom:2px}
+  .page-sub{font-size:12.5px;color:#64748b;margin-bottom:1.2rem}
+  .step-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;margin-bottom:1.25rem}
+  .nav-row{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+  .nav-btn{font-size:11.5px;padding:6px 14px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;color:#475569;text-decoration:none;transition:all .15s;white-space:nowrap}
+  .nav-btn:hover{background:#f1f5f9}
+  .nav-btn.cur{background:#1e3a5f;color:#e0f2fe;border-color:#1e3a5f}
+  .ctx-box{background:#fff;border:1px solid #e2e8f0;border-left:3px solid #1d4ed8;border-radius:8px;padding:.9rem 1.1rem;margin-bottom:1.2rem;font-size:12.5px;color:#334155;line-height:1.75}
+  .ctx-box strong{color:#1d4ed8}
+  .update-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.8rem 1.1rem;margin-bottom:1.25rem;font-size:12px;color:#166534;line-height:1.7}
+  .warn-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:.75rem 1rem;font-size:12px;color:#92400e;margin-bottom:1rem;line-height:1.6}
+  .sec-lbl{font-size:10.5px;font-weight:700;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin:1.6rem 0 .8rem}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem}
+  .kpi{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem 1.1rem}
+  .kpi.accent{border-color:#bfdbfe;background:linear-gradient(135deg,#eff6ff,#fff)}
+  .kpi.red-k{border-color:#fecaca;background:linear-gradient(135deg,#fff1f2,#fff)}
+  .kpi.green-k{border-color:#bbf7d0;background:linear-gradient(135deg,#f0fdf4,#fff)}
+  .kpi-lbl{font-size:10.5px;color:#64748b;margin-bottom:5px;font-weight:500}
+  .kpi-val{font-size:22px;font-weight:700;color:#0f172a;line-height:1}
+  .kpi-val.b{color:#1d4ed8}.kpi-val.r{color:#dc2626}.kpi-val.g{color:#059669}
+  .kpi-sub{font-size:10.5px;color:#94a3b8;margin-top:4px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.1rem 1.2rem}
+  .card.full{grid-column:1/-1}
+  .ct{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:2px}
+  .cs{font-size:11px;color:#64748b;margin-bottom:.85rem}
+  .cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+  .cmp-table th{background:#f1f5f9;padding:8px 10px;text-align:center;font-weight:600;color:#475569;border:1px solid #e2e8f0;font-size:11.5px}
+  .cmp-table td{padding:8px 10px;border:1px solid #e2e8f0;text-align:center;color:#374151}
+  .cmp-table tr:nth-child(even) td{background:#f8fafc}
+  .cmp-table td.hi{font-weight:700;color:#1d4ed8}
+  .cmp-table td.new-val{font-weight:700;color:#059669;background:#f0fdf4}
+  .bi{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .bl{font-size:11px;color:#475569;width:90px;flex-shrink:0;text-align:right;font-weight:500}
+  .bt{flex:1;background:#f1f5f9;border-radius:4px;height:22px;position:relative;overflow:hidden}
+  .bbg{position:absolute;left:0;top:0;height:100%;border-radius:4px}
+  .bv{position:relative;z-index:1;font-size:10.5px;font-weight:600;padding:0 7px;line-height:22px;float:right;white-space:nowrap}
+  .uid-table{width:100%;border-collapse:collapse;font-size:11.5px}
+  .uid-table th{background:#1e3a5f;color:#e0f2fe;padding:8px 9px;text-align:center;font-weight:600;position:sticky;top:0;font-size:11px}
+  .uid-table td{padding:7px 9px;border-bottom:1px solid #f1f5f9;text-align:center;color:#374151}
+  .uid-table tr.mau30{background:#f0fdf4}
+  .uid-table tr.mau90{background:#fffbeb}
+  .uid-table tr:hover{background:#eff6ff}
+  .badge-mau30{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+  .badge-mau90{background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+  .mono{font-family:'JetBrains Mono',monospace}
+  hr{border:none;border-top:1px solid #e2e8f0;margin:1.75rem 0}
+  .v3-banner{background:linear-gradient(135deg,#1e3a5f 0%,#1d4ed8 100%);border-radius:12px;padding:1.1rem 1.4rem;margin-bottom:1.25rem;color:#e0f2fe}
+  .v3-title{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:.6rem}
+  .v3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .v3-stat{text-align:center;background:rgba(255,255,255,.1);border-radius:8px;padding:.7rem .5rem}
+  .v3-val{font-size:21px;font-weight:700;color:#fff}
+  .v3-lbl{font-size:10.5px;color:#93c5fd;margin-top:3px}
+  @media(max-width:720px){
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .v3-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="top-bar">
+    <span class="srv-tag">KR STD_430011435</span>
+    <span style="font-size:11px;color:#94a3b8">기준일 2026-05-12 | 3차 정밀 분석 반영 2026-05-15</span>
+  </div>
+  <div class="page-title">마영전 아바타 분해 시스템 기획 검토</div>
+  <div class="page-sub">④ UID(유저) 단위 분석 — 개발실 피드백 이후 2·3차 통합 결과</div>
+  <div class="step-badge">2·3차 통합 분석 · CID→UID 매핑 99.2% 완료</div>
+
+  <div class="nav-row">
+    <a class="nav-btn" href="01_main.html">① 기본 5파츠 분석</a>
+    <a class="nav-btn" href="02_distribution.html">② 보유량 분포</a>
+    <a class="nav-btn" href="03_unworn.html">③ 미착용 파츠</a>
+    <a class="nav-btn cur" href="04_uid_analysis.html">④ UID 분석</a>
+    <a class="nav-btn" href="05_decomp_demand.html">⑤ 분해 수요 최종</a>
+  </div>
+
+  <div class="update-box">
+    <strong>✅ 2026-05-15 3차 정밀 분석 완료</strong><br>
+    스냅샷 전수 수집(160개 구간, 1,291,521개 행)을 통해 charid × itemid 레벨 정밀 매칭이 완료됐습니다.
+    2차 분석의 상한선 추정이 <strong>정확한 수치로 대체</strong>됐습니다. 최종 분해 수요 → ⑤ 페이지 참고.
+  </div>
+
+  <div class="ctx-box">
+    <strong>분석 흐름:</strong> 1차(CID) "상위 2.9%에 89.1% 집중" 확인 →
+    <strong>개발실 피드백</strong> "유저 단위로 봐야 실제 수요 예측 가능" →
+    2차: CID→UID 매핑 99.2%, 유저별 합산 →
+    3차: 스냅샷 전수 수집으로 <strong>미착용 파츠 정밀 산출 완료</strong>
+  </div>
+
+  <div class="warn-box">
+    ⚠ <strong>'파츠 가치(pt)' 표현 안내:</strong>
+    이 페이지의 pt 수치는 분해로 새로 얻는 포인트가 아닙니다. 드레스 포인트는 파츠 획득 시 이미 지급됩니다.
+    여기서는 <u>여분 파츠의 pt 등급을 가치 비교 참고 지표로만</u> 활용합니다.
+    실제 분해 수요 확정 수치 → <a href="05_decomp_demand.html" style="color:#92400e;font-weight:600">⑤ 분해 수요 최종</a>
+  </div>
+
+  <!-- 3차 핵심 수치 배너 -->
+  <div class="v3-banner">
+    <div class="v3-title">📊 3차 분석 확정 — 최종 분해 수요 수치</div>
+    <div class="v3-grid">
+      <div class="v3-stat">
+        <div class="v3-val">4,238명</div>
+        <div class="v3-lbl">① 중복 보유 UID (25.3%)</div>
+      </div>
+      <div class="v3-stat">
+        <div class="v3-val">13,916명</div>
+        <div class="v3-lbl">② 단일 미착용 UID (83.1%)</div>
+      </div>
+      <div class="v3-stat">
+        <div class="v3-val">14,027명</div>
+        <div class="v3-lbl">보수적 합산 83.8% ← 권장</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="sec-lbl">핵심 지표 — UID 단위 (2차 기준)</div>
+  <div class="kpi-grid">
+    <div class="kpi accent">
+      <div class="kpi-lbl">전체 UID</div>
+      <div class="kpi-val b">16,737</div>
+      <div class="kpi-sub">명 | 1인 평균 4.3개 CID</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">CID→UID 매핑률</div>
+      <div class="kpi-val">99.2%</div>
+      <div class="kpi-sub">71,119 / 71,715개</div>
+    </div>
+    <div class="kpi red-k">
+      <div class="kpi-lbl">pt 합산 1,000pt+ UID</div>
+      <div class="kpi-val r">49</div>
+      <div class="kpi-sub">명 — 전원 MAU(90일) 활성</div>
+    </div>
+    <div class="kpi green-k">
+      <div class="kpi-lbl">스냅샷 커버리지 (3차)</div>
+      <div class="kpi-val g">88.2%</div>
+      <div class="kpi-sub">63,230 / 71,715개 CID</div>
+    </div>
+  </div>
+
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.7rem 1rem;font-size:12px;color:#1e40af;margin-bottom:1.1rem">
+    📊 <strong>기준일 KR 서버 MAU/DAU (2026-05-12):</strong>&nbsp;
+    DAU 6,926명 | MAU(30일) 13,310명 | MAU(90일) 22,448명
+  </div>
+
+  <!-- 1차 vs 2차 비교표 -->
+  <div class="sec-lbl">1차(CID) vs 2차(UID) vs 3차 정밀 — 수치 비교</div>
+  <div class="card full" style="margin-bottom:12px">
+    <div class="ct">분석 단위 및 차수별 수치 변화</div>
+    <div class="cs">동일 데이터를 CID / UID 기준으로 집계, 3차 정밀 산출값 포함</div>
+    <table class="cmp-table">
+      <thead>
+        <tr><th>항목</th><th>1차 — CID</th><th>2차 — UID</th><th>3차 — UID 정밀</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>전체 수</td><td>71,715개</td><td class="hi">16,737명</td><td>—</td></tr>
+        <tr><td>pt 가치 중앙값</td><td>7pt</td><td>0pt</td><td>—</td></tr>
+        <tr><td>pt 가치 평균</td><td>55pt</td><td>22.5pt</td><td>—</td></tr>
+        <tr><td>pt 합산 1,000pt+</td><td>33개 CID</td><td>49명 UID</td><td>—</td></tr>
+        <tr><td>중복 보유 UID</td><td>—</td><td>3,941명 (23.5%)</td><td class="new-val">4,238명 (25.3%)</td></tr>
+        <tr><td>미착용 포함 수요</td><td>—</td><td>15,133명 (90.4%) ← 상한</td><td class="new-val">14,027명 (83.8%) ← 확정</td></tr>
+        <tr><td>미착용 파츠 수량</td><td>—</td><td>추정 불가</td><td class="new-val">1,309,458개</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 차트 -->
+  <div class="grid2">
+    <div class="card">
+      <div class="ct">UID별 pt 가치 구간 분포</div>
+      <div class="cs">전체 16,737명 — 여분 파츠 pt 등급 합산 기준</div>
+      <div id="uid-dist"></div>
+    </div>
+    <div class="card">
+      <div class="ct">상위 2.9% pt 집중도 — CID vs UID</div>
+      <div class="cs">CID 89.1% → UID 68.1%로 완화 (멀티CID 분산 효과)</div>
+      <canvas id="pie-chart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- 49명 테이블 -->
+  <div class="sec-lbl">pt 합산 1,000pt 이상 UID 49명 — 전원 MAU(90일) 이내 활성</div>
+  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:.75rem 1rem;font-size:12px;color:#991b1b;margin-bottom:.85rem;line-height:1.65">
+    멀티 CID에 분산된 파츠를 UID 기준으로 합산했을 때만 드러나는 그룹입니다.
+    <strong>시스템 오픈 시 즉각 행동 가능성이 가장 높으며</strong>, 초기 시스템 지표에 집중 영향을 미칩니다.
+    별도 모니터링 플랜이 필요합니다.<br>
+    <span style="color:#166534;font-weight:600">■ 녹색</span> = MAU(30일) 41명 &nbsp;|&nbsp;
+    <span style="color:#854d0e;font-weight:600">■ 노란색</span> = MAU(90일) 8명
+  </div>
+  <div class="card full" style="overflow:auto;max-height:540px;padding:0">
+    <table class="uid-table" id="uid-table"></table>
+  </div>
+
+  <!-- 3차 미착용 요약 -->
+  <hr>
+  <div class="sec-lbl">3차 분석 — itemid 레벨 정밀 미착용 산출 결과</div>
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-lbl">스냅샷 수집 행</div>
+      <div class="kpi-val" style="font-size:17px">1,291,521</div>
+      <div class="kpi-sub">개 (160개 구간 전수)</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">스냅샷 보유 CID</div>
+      <div class="kpi-val">63,230</div>
+      <div class="kpi-sub">개 / 전체 88.2%</div>
+    </div>
+    <div class="kpi accent">
+      <div class="kpi-lbl">단일 미착용 파츠 (정밀)</div>
+      <div class="kpi-val b" style="font-size:17px">1,309,458</div>
+      <div class="kpi-sub">개 (스냅샷 있는 캐릭 기준)</div>
+    </div>
+    <div class="kpi green-k">
+      <div class="kpi-lbl">보수적 합산 수요 UID</div>
+      <div class="kpi-val g">14,027</div>
+      <div class="kpi-sub">명 / 83.8% — 권장 수치</div>
+    </div>
+  </div>
+
+  <!-- 2차 vs 3차 비교 -->
+  <div class="card full">
+    <div class="ct">2차 추정 → 3차 정밀 수치 변화 및 원인</div>
+    <div class="cs">상한선 추정에서 itemid 레벨 직접 매칭으로 방법론 전환</div>
+    <table class="cmp-table">
+      <thead>
+        <tr><th>항목</th><th>2차 추정 (상한선)</th><th>3차 정밀 (확정)</th><th>변화 원인</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>중복 보유 UID</td>
+          <td>3,941명 (23.5%)</td>
+          <td class="new-val">4,238명 (25.3%)</td>
+          <td>qty 합산 기준 적용 시 소폭 증가</td>
+        </tr>
+        <tr>
+          <td>미착용 포함 수요</td>
+          <td>15,133명 (90.4%)</td>
+          <td class="new-val">14,027명 (83.8%)</td>
+          <td>비활성 캐릭 과대반영 수정 −6.6%p</td>
+        </tr>
+        <tr>
+          <td>미착용 파츠 수량</td>
+          <td>추정 불가</td>
+          <td class="new-val">1,309,458개</td>
+          <td>itemid 직접 차집합 계산</td>
+        </tr>
+        <tr>
+          <td>추정 방식</td>
+          <td>보유 종류 수 − 착용 종류 수 (간접)</td>
+          <td class="new-val">charid × itemid 직접 차집합</td>
+          <td>정확도 대폭 향상</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="font-size:11px;color:#94a3b8;text-align:center;padding-top:1.5rem">
+    마비노기 영웅전 아바타 분해 시스템 기획 검토 · 내부 자료 · 기준일 2026-05-12 · 3차 업데이트 2026-05-15
+  </div>
+</div>
+
+<script>
+const fmt = n => n.toLocaleString();
+
+// UID 구간 분포
+const UID_DIST = [
+  {label:'0pt',cnt:12797,pct:76.5,color:'#cbd5e1'},
+  {label:'1~49pt',cnt:2063,pct:12.3,color:'#93c5fd'},
+  {label:'50~99pt',cnt:1149,pct:6.9,color:'#60a5fa'},
+  {label:'100~499pt',cnt:590,pct:3.5,color:'#3b82f6'},
+  {label:'500~999pt',cnt:89,pct:0.53,color:'#f59e0b'},
+  {label:'1,000pt+',cnt:49,pct:0.29,color:'#dc2626'},
+];
+const mx = Math.max(...UID_DIST.map(d=>d.cnt));
+document.getElementById('uid-dist').innerHTML = UID_DIST.map(d=>`
+  <div class="bi">
+    <div class="bl">${d.label}</div>
+    <div class="bt">
+      <div class="bbg" style="width:${(d.cnt/mx*100).toFixed(1)}%;background:${d.color}"></div>
+      <span class="bv" style="color:${d.color}">${fmt(d.cnt)}명 (${d.pct}%)</span>
+    </div>
+  </div>`).join('');
+
+// 도넛
+new Chart(document.getElementById('pie-chart'),{
+  type:'doughnut',
+  data:{
+    labels:['CID 상위 2.9%','CID 나머지','UID 상위 2.9%','UID 나머지'],
+    datasets:[
+      {data:[89.1,10.9],backgroundColor:['#1d4ed8','#bfdbfe'],borderWidth:2,borderColor:'#fff'},
+      {data:[68.1,31.9],backgroundColor:['#059669','#a7f3d0'],borderWidth:2,borderColor:'#fff'}
+    ]
+  },
+  options:{responsive:true,plugins:{
+    legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}},
+    tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}%`}}
+  },cutout:'48%'}
+});
+
+// 49명 테이블
+const TOP49=[
+  [251985983,7162,1,'2026-05-08','MAU(30일)'],[1694570057,4734,4,'2026-05-13','MAU(30일)'],
+  [1594002021,4616,9,'2026-05-10','MAU(30일)'],[419670032,4333,1,'2026-03-11','MAU(90일)'],
+  [1057459887,4320,30,'2026-05-13','MAU(30일)'],[335799954,4205,2,'2026-04-18','MAU(30일)'],
+  [671199755,4184,20,'2026-05-14','MAU(30일)'],[2013576670,4036,2,'2026-02-11','MAU(90일)'],
+  [84341113,3270,29,'2026-05-04','MAU(30일)'],[134221146,3061,8,'2026-05-13','MAU(30일)'],
+  [872459650,2650,2,'2026-04-16','MAU(30일)'],[1191470663,2509,6,'2026-05-12','MAU(30일)'],
+  [1225164663,2420,9,'2026-04-28','MAU(30일)'],[1343018670,2386,6,'2026-05-14','MAU(30일)'],
+  [1442849336,2284,9,'2026-04-03','MAU(90일)'],[67376107,2248,6,'2026-05-13','MAU(30일)'],
+  [1376203271,2070,3,'2026-04-21','MAU(30일)'],[268662496,1864,3,'2026-05-04','MAU(30일)'],
+  [1610772897,1825,23,'2026-05-14','MAU(30일)'],[1426582679,1779,1,'2026-04-29','MAU(30일)'],
+  [2114598980,1754,17,'2026-04-27','MAU(30일)'],[956589830,1696,12,'2026-03-28','MAU(90일)'],
+  [1929406306,1692,4,'2026-05-14','MAU(30일)'],[100835677,1635,1,'2026-02-25','MAU(90일)'],
+  [554060634,1543,9,'2026-04-19','MAU(30일)'],[16794746,1532,20,'2026-05-13','MAU(30일)'],
+  [973137536,1517,7,'2026-04-19','MAU(30일)'],[554152733,1480,18,'2026-05-14','MAU(30일)'],
+  [1695098900,1413,7,'2026-05-12','MAU(30일)'],[1828901529,1380,7,'2026-05-12','MAU(30일)'],
+  [167867056,1375,17,'2026-05-09','MAU(30일)'],[302244799,1340,6,'2026-05-14','MAU(30일)'],
+  [1006690146,1330,16,'2026-05-13','MAU(30일)'],[1627625618,1330,19,'2026-05-13','MAU(30일)'],
+  [1309226884,1210,23,'2026-05-14','MAU(30일)'],[251913989,1203,9,'2026-05-04','MAU(30일)'],
+  [688461640,1180,22,'2026-05-14','MAU(30일)'],[990407223,1174,12,'2026-05-09','MAU(30일)'],
+  [1644328553,1171,6,'2026-05-13','MAU(30일)'],[688415789,1099,15,'2026-05-13','MAU(30일)'],
+  [319468640,1094,5,'2026-05-13','MAU(30일)'],[319098039,1085,13,'2026-05-13','MAU(30일)'],
+  [1459758946,1061,7,'2026-03-18','MAU(90일)'],[872647424,1051,1,'2026-05-02','MAU(30일)'],
+  [84191632,1049,1,'2026-04-13','MAU(30일)'],[1526846402,1042,29,'2026-05-13','MAU(30일)'],
+  [889851672,1040,2,'2026-03-29','MAU(90일)'],[234988730,1039,14,'2026-05-14','MAU(30일)'],
+  [1912801490,1021,4,'2026-03-12','MAU(90일)'],
+];
+const tbl=document.getElementById('uid-table');
+tbl.innerHTML=`<thead><tr>
+  <th>순위</th><th>UID</th><th>pt 가치 합산</th><th>보유 CID</th><th>최근 접속</th><th>액티브</th>
+</tr></thead><tbody>`+TOP49.map((r,i)=>{
+  const is30=r[4]==='MAU(30일)';
+  return `<tr class="${is30?'mau30':'mau90'}">
+    <td class="mono" style="color:#94a3b8">${i+1}</td>
+    <td class="mono" style="color:#334155">${r[0]}</td>
+    <td class="mono" style="font-weight:700;color:#dc2626">${fmt(r[1])}pt</td>
+    <td style="color:#475569">${r[2]}개</td>
+    <td style="color:#64748b;font-size:11px">${r[3]}</td>
+    <td>${is30?'<span class="badge-mau30">MAU(30일)</span>':'<span class="badge-mau90">MAU(90일)</span>'}</td>
+  </tr>`;
+}).join('')+'</tbody>';
+</script>
+</body>
+</html>

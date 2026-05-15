@@ -44,16 +44,35 @@
     .kpi-grid{grid-template-columns:repeat(2,1fr)}
     .row2{grid-template-columns:1fr}
   }
+  .nav-wrap{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+  .nav-btn{font-size:12px;padding:6px 14px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;text-decoration:none;transition:all .15s}
+  .nav-btn:hover{background:#f3f4f6}
+  .nav-btn.cur{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
 </style>
 </head>
 <body>
 <div class="page">
   <div class="page-title">3개월 내 미착용 파츠 현황</div>
   <div class="page-sub">기준일: 2026-05-12 &nbsp;|&nbsp; 스냅샷 범위: 2026-02-11~05-10 (3개월) &nbsp;|&nbsp; 전체 유저 기준</div>
+  <div class="nav-wrap">
+    <a class="nav-btn" href="01_main.html">① 기본 5파츠 분석</a>
+    <a class="nav-btn" href="02_distribution.html">② 보유량 분포</a>
+    <a class="nav-btn cur" href="03_unworn.html">③ 미착용 파츠</a>
+    <a class="nav-btn" href="04_uid_analysis.html">④ UID 분석</a>
+    <a class="nav-btn" href="05_decomp_demand.html">⑤ 분해 수요 최종</a>
+  </div>
+
+  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.75rem 1rem;font-size:12px;color:#166534;margin-bottom:.75rem;line-height:1.65">
+    ✅ <strong>2026-05-15 3차 정밀 분석 완료 — 분석 방식이 바뀌었습니다.</strong><br>
+    이 페이지(③)는 <strong>2차 분석 방식 기준</strong>으로 작성됐습니다: "파츠 종류 단위로 전체 유저 중 3개월 내 아무도 착용하지 않은 파츠 목록"<br>
+    3차에서는 <strong>charid × itemid 레벨 정밀 매칭</strong>으로 전환됐습니다: 각 유저·캐릭터별로 보유한 파츠를 실제 착용 이력과 대조해 미착용 여부를 개인 단위로 판별합니다.<br>
+    정밀 산출 결과(단일 미착용 1,309,458개)는 <a href="05_decomp_demand.html" style="color:#166534;font-weight:600">⑤ 분해 수요 최종</a>을 참고하세요.
+  </div>
 
   <div class="note-box">
-    ⚠ <strong>해석 주의</strong> — 이 캐릭터가 착용 안 한 파츠가 아닌, <strong>전체 유저 중 아무도 3개월 내 착용하지 않은 파츠</strong> 기준입니다.
-    스냅샷은 접속 후 착용 중인 상태일 때만 기록되므로 <strong>"미착용"과 "비접속"을 구분할 수 없어 실제 수치는 과소 산출 가능성</strong>이 있습니다.
+    ⚠ <strong>이 페이지의 해석 주의 (2차 분석 방식)</strong> — 특정 파츠 종류가 전체 유저 중 아무도 3개월 내 착용하지 않은 경우를 집계한 것입니다.
+    개인별 미착용 여부가 아닌 <strong>파츠 종류 단위 집계</strong>이며, 3차 방법론(charid × itemid 매칭)과는 다릅니다.
+    스냅샷은 접속 후 착용 중 상태일 때만 기록되므로 <strong>"미착용"과 "비접속"을 구분할 수 없어 실제 수치는 과소 산출 가능성</strong>이 있습니다.
   </div>
 
   <div class="kpi-grid" style="margin-bottom:1rem">
@@ -135,8 +154,15 @@ new Chart(document.getElementById('unworn-chart'),{type:'bar',
     scales:{x:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#9ca3af',font:{size:10},callback:v=>fmt(v)}},
             y:{grid:{display:false},ticks:{color:'#374151',font:{size:10}}}}}});
 </script>
-  <div style="font-size:11px;color:#9ca3af;text-align:center;padding-bottom:1rem;margin-top:1.75rem">
-    마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:.9rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:1.5rem">
+    <div>
+      <div style="font-size:13px;font-weight:600;color:#1e40af;margin-bottom:3px">개인별 미착용 파츠 정밀 산출 결과 보기</div>
+      <div style="font-size:12px;color:#3b82f6">3차: charid × itemid 레벨 매칭 완료 · 단일 미착용 1,309,458개 · 수요 83.8%</div>
+    </div>
+    <a href="05_decomp_demand.html" style="display:inline-block;background:#059669;color:#fff;font-size:12px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none">⑤ 분해 수요 최종 →</a>
+  </div>
+  <div style="font-size:11px;color:#9ca3af;text-align:center;padding-bottom:1rem;margin-top:1.5rem">
+    마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12 기준 · 3차 업데이트 2026-05-15
   </div>
 </div>
 </body>

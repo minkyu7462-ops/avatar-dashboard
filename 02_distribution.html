@@ -44,12 +44,23 @@
     .kpi-grid{grid-template-columns:repeat(2,1fr)}
     .row2{grid-template-columns:1fr}
   }
+  .nav-wrap{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+  .nav-btn{font-size:12px;padding:6px 14px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;text-decoration:none;transition:all .15s}
+  .nav-btn:hover{background:#f3f4f6}
+  .nav-btn.cur{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
 </style>
 </head>
 <body>
 <div class="page">
   <div class="page-title">캐릭터당 아바타 파츠 보유량 분포</div>
   <div class="page-sub">기준일: 2026-05-12 &nbsp;|&nbsp; 분석 캐릭터: 71,715명 &nbsp;|&nbsp; 전체 파츠 기준</div>
+  <div class="nav-wrap">
+    <a class="nav-btn" href="01_main.html">① 기본 5파츠 분석</a>
+    <a class="nav-btn cur" href="02_distribution.html">② 보유량 분포</a>
+    <a class="nav-btn" href="03_unworn.html">③ 미착용 파츠</a>
+    <a class="nav-btn" href="04_uid_analysis.html">④ UID 분석</a>
+    <a class="nav-btn" href="05_decomp_demand.html">⑤ 분해 수요 최종</a>
+  </div>
 
   <div class="kpi-grid" style="margin-bottom:1.25rem">
     <div class="kpi"><div class="kpi-lbl">분석 캐릭터</div><div class="kpi-val">71,715</div><div class="kpi-sub">명</div></div>
@@ -101,7 +112,7 @@ new Chart(document.getElementById('cum-chart'),{type:'line',
             y:{min:0,max:100,grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>v+'%'}}}}});
 </script>
   <div style="font-size:11px;color:#9ca3af;text-align:center;padding-bottom:1rem;margin-top:1.75rem">
-    마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12
+    마비노기 영웅전 아바타 분해 시스템 기획 검토용 내부 자료 · 2026-05-12 기준 · 3차 업데이트 2026-05-15
   </div>
 </div>
 </body>
