@@ -498,10 +498,10 @@ const maxUid = Math.max(...SEGMENTS.map(d=>d.uid));
 document.getElementById('segment-bars').innerHTML = SEGMENTS.map((d,i)=>`
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
     <div style="font-size:10.5px;color:#94a3b8;width:80px;flex-shrink:0;text-align:right">${d.label}</div>
-    <div style="flex:1;background:#0f172a;border-radius:4px;height:22px;position:relative;overflow:hidden">
+    <div style="flex:1;background:#0f172a;border-radius:4px;height:22px;position:relative;">
       <div style="position:absolute;left:0;top:0;height:100%;width:${(d.uid/maxUid*100).toFixed(1)}%;background:${COLORS[i]};border-radius:4px"></div>
-      <span style="position:relative;z-index:1;font-size:10.5px;font-weight:700;color:${COLORS[i]};padding:0 7px;line-height:22px;float:right;white-space:nowrap">${fmt(d.uid)}명 (${d.pct}%)</span>
     </div>
+    <div style="font-size:10.5px;font-weight:700;color:${COLORS[i]};white-space:nowrap;width:110px;flex-shrink:0">${fmt(d.uid)}명 (${d.pct}%)</div>
   </div>`).join('');
 
 // 파이차트 — 파츠 총량 기준
@@ -613,12 +613,12 @@ const GRADES = [
 ];
 const mxG = Math.max(...GRADES.map(d=>d.qty));
 document.getElementById('grade-bars').innerHTML = GRADES.map(d=>`
-  <div class="bi">
-    <div class="bl" style="width:120px">${d.label}</div>
-    <div class="bt">
-      <div class="bbg" style="width:${(d.qty/mxG*100).toFixed(1)}%;background:${d.color}22;border-right:3px solid ${d.color}"></div>
-      <span class="bv" style="color:${d.color}">${fmt(d.qty)}개 &nbsp;|&nbsp; <span style="color:#94a3b8">${fmt(d.uid)}명</span></span>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+    <div style="font-size:11px;color:#94a3b8;width:120px;flex-shrink:0;text-align:right;font-weight:500">${d.label}</div>
+    <div style="flex:1;background:#0f172a;border-radius:4px;height:22px;position:relative;">
+      <div style="position:absolute;left:0;top:0;height:100%;width:${(d.qty/mxG*100).toFixed(1)}%;background:${d.color}22;border-right:3px solid ${d.color};border-radius:4px"></div>
     </div>
+    <div style="font-size:10.5px;font-weight:700;color:${d.color};white-space:nowrap;width:140px;flex-shrink:0">${fmt(d.qty)}개 <span style="color:#94a3b8;font-weight:400">| ${fmt(d.uid)}명</span></div>
   </div>`).join('');
 </script>
 </body>
